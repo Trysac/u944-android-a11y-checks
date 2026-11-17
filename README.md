@@ -1,48 +1,35 @@
 # android-a11y-checks
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![CI](https://github.com/Trysac/u944-android-a11y-checks/actions/workflows/ci.yml/badge.svg)](https://github.com/Trysac/u944-android-a11y-checks/actions/workflows/ci.yml)
+Android teams typically catch accessibility defects in manual audits or store reviews, as standard UI tests often ignore touch target size, contrast ratios, and labelling requirements. `android-a11y-checks` provides a platform-neutral, pure-JVM accessibility rule engine for Android View and Jetpack Compose semantics snapshots.
 
-Accessibility rule engine for Android view and Compose semantics snapshots that reports touch target, contrast and labelling problems with WCAG 2.2 success criterion references
-
-## Problem
-
-Describe in two or three sentences the concrete problem this utility solves, who hits it, and what
-they do today without it. Replace this paragraph when the first real feature lands.
-
-## Install
-
-Maven coordinates `io.github.trysac:android-a11y-checks`. Until it is published to Maven Central, build
-it from a release tag through JitPack (`https://jitpack.io`), then
-declare in `build.gradle.kts`:
+## Installation
 
 ```kotlin
-dependencies {
-    implementation("io.github.trysac:android-a11y-checks:0.1.0")
-}
+implementation("io.github.trysac:android-a11y-checks:1.0.0")
 ```
-
-Requires Java 21 or newer. No dependencies outside the Kotlin standard library.
 
 ## Usage
 
 ```kotlin
-import io.github.trysac.android_a11y_checks.Text
+import io.github.trysac.android_a11y_checks.*
 
-// normalize trims surrounding whitespace and lower-cases the text.
-val name = Text.normalize("  Hello World ") // "hello world"
-
-// Blank input is rejected explicitly instead of returning an empty string.
-Text.normalize("   ") // throws BlankInputException ("input is blank")
+val root = SemanticsNode("root", Role.BUTTON, Rect(0, 0, 40, 40), clickable = true)
+val checker = A11yChecker(density = 2.0f)
+val report = checker.check(root)
+println(report.toJson())
 ```
 
-## Documentation
+## Public API
 
-- [Architecture](docs/ARCHITECTURE.md) and [decisions](docs/decisions/)
-- [Testing](docs/TESTING.md) and [security](docs/SECURITY.md)
-- [Project record](docs/PROJECT.md) and [stack](docs/STACK.md)
-- [Changelog](CHANGELOG.md) and [contributing guide](CONTRIBUTING.md)
+- `A11yChecker(density: Float, rules: Set<String>, maxNodes: Int, maxDepth: Int)`: Validates configuration and executes checks.
+- `A11yChecker.check(root: SemanticsNode)`: Returns `A11yReport`. Throws `A11yException` (`tree_too_large`, `too_deep`, `invalid_density`) if bounds are exceeded.
+- `SemanticsNode`: Snapshot model of UI elements with properties like `role`, `boundsPx`, `text`, `clickable`, etc.
+- `Contrast.ratio(fg: Int, bg: Int)`: Calculates WCAG 2.2 contrast ratio for sRGB colors.
 
-## License
+## Why not Accessibility Test Framework for Android?
 
-[MIT](LICENSE) (c) 2026 Miguel Gomez
+Accessibility Test Framework for Android requires `android.view.View` or `AccessibilityNodeInfo` instances, making it difficult to run in pure JVM unit tests without Robolectric or an emulator. `android-a11y-checks` uses a platform-free `SemanticsNode` snapshot, enabling fast, emulator-free accessibility assertions in standard unit tests.
+
+## Security
+
+See [docs/SECURITY.md](docs/SECURITY.md).

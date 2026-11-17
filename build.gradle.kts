@@ -15,7 +15,8 @@ plugins {
 
 group = "io.github.trysac"
 version = "0.1.0"
-description = "Accessibility rule engine for Android view and Compose semantics snapshots that reports touch target, contrast and labelling problems with WCAG 2.2 success criterion references"
+description =
+    "Accessibility rule engine for Android view and Compose semantics snapshots that reports touch target, contrast and labelling problems with WCAG 2.2 success criterion references"
 
 // Build output; the gates image moves it out of the mounted repository (FABRICA_BUILD_DIR).
 providers.environmentVariable("FABRICA_BUILD_DIR").orNull?.takeIf { it.isNotEmpty() }?.let {

@@ -1,4 +1,6 @@
 package io.github.trysac.android_a11y_checks
 
-/** The input is empty or holds only whitespace; the message is `input is blank`. */
+/**
+ * Thrown when a text helper receives an empty or whitespace-only string.
+ */
 public class BlankInputException : IllegalArgumentException("input is blank")

@@ -1,30 +1,16 @@
 # Architecture
 
-## Purpose
+## Overview
 
-`io.github.trysac:android-a11y-checks` is a small, dependency-free Kotlin library: Accessibility rule engine for Android view and Compose semantics snapshots that reports touch target, contrast and labelling problems with WCAG 2.2 success criterion references
+`android-a11y-checks` is a pure-JVM Kotlin library in package `io.github.trysac.android_a11y_checks` with zero external runtime dependencies. It separates UI tree capture (performed by thin Compose or Espresso test adapters in an Android project) from accessibility rule evaluation.
 
-## Shape
+## Components
 
-```text
-caller code --> package io.github.trysac.android_a11y_checks (src/main/kotlin)
-                    |
-                    +-- objects and top-level functions that are pure; no I/O, no global mutable state
-                    +-- internal or private helpers (optional)
-```
-
-- **Public API**: every public declaration of the package. `internal` and `private` declarations
-  may change without a major version.
-- **Errors**: invalid input throws an `IllegalArgumentException` subclass of the library (such as
-  `BlankInputException`) documented with `@throws`. The library never prints or exits.
-- **Side effects**: none. If a feature needs I/O, accept an `InputStream`, a `Reader` or a small
-  interface instead of opening resources, and record the choice in an ADR.
-
-## Quality contract
-
-`scripts/Check.java` is the single definition of the gates; `fabrica.json` tells the factory and CI
-how to run it. See [TESTING.md](TESTING.md).
-
-## Decisions
-
-Architecture decisions are recorded in [decisions/](decisions/) as numbered ADRs.
+1. **Snapshot Model (`SemanticsNode`, `Role`, `Rect`)**: Immutable value objects representing a captured UI tree in physical pixels (`boundsPx`), scale-independent font size (`textSizeSp`), ARGB colors, and accessibility properties (`importantForAccessibility`, `mergeDescendants`).
+2. **Contrast Calculator (`Contrast`)**: Implements the WCAG 2.2 relative luminance formula over 8-bit sRGB channels linearized at the `0.04045` threshold, ignoring the alpha channel.
+3. **Rule Engine (`A11yChecker`)**:
+   - Validates configuration (`density`, `rules`, `maxNodes`, `maxDepth`) at construction.
+   - Performs an iterative pre-order traversal to enforce `maxNodes` (`tree_too_large`) and `maxDepth` (`too_deep`) before evaluating rules.
+   - Skips subtrees where `importantForAccessibility == false` or `boundsPx` has non-positive width or height.
+   - Evaluates the 7 rules (`touch_target`, `contrast`, `missing_label`, `image_no_label`, `editable_no_label`, `duplicate_label`, `redundant_role`) and truncates any quoted user text snippet to 40 characters and total issue messages to 200 characters.
+4. **Reporting (`A11yReport`, `Issue`)**: Stores issues sorted by `(rule, path)` and serializes them deterministically via `toJson()` without third-party JSON dependencies.
