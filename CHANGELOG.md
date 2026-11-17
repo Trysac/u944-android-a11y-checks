@@ -9,4 +9,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Add platform-neutral Android accessibility rule engine (`SemanticsNode`, `A11yChecker`, `Contrast`, `A11yReport`, `Issue`, `A11yException`) covering 7 WCAG 2.2 rules.
 - Initial project structure from the factory utility template.

@@ -3,32 +3,17 @@
 ## Running
 
 ```sh
-java scripts/Gradle.java test   # JUnit 5 and jqwik tests
-java scripts/Check.java         # every gate, as CI and the factory run it
+java scripts/Gradle.java test
 ```
 
 ## Policy
 
-- Line coverage of the library (measured by Kover) must stay at or above 80 %; the gate fails
-  below it.
-- Tests exercise the public API. They assert every observable effect: returned values, thrown
-  exceptions (`assertThrows<T>`) and their messages.
-- Property tests (jqwik `@Property`) state invariants such as idempotence or round trips.
-- Each bug fix starts with a failing test that reproduces it.
-- Tests are deterministic: no network, no wall clock, no dependence on test order.
+- Line coverage must be at or above 80%.
+- Property-based tests (jqwik) state invariants.
+- Tests assert observable effects (returned values, thrown `A11yException` types).
 
-## Tiers
+## Coverage
 
-- Local tier (every gate run, coverage measured here): unit and property tests, plus conformance
-  on small fixtures kept in the repository.
-- CI tier: conformance that needs an external tool or a download. Tag the test class or function
-  with `@Tag("conformance")`; the Gradle test task excludes the tag unless `FABRICA_CI=1`, while
-  the lint gate always compiles it. The CI `conformance` job sets `FABRICA_CI=1` and runs the full
-  suite. Tools are installed by the optional `ci/conformance-setup.sh` (bash, CI only; verify every
-  download against a pinned SHA-256), and tests skip cleanly (`Assumptions.assumeTrue`) when their
-  tool is missing.
-
-## Layout
-
-Tests live in `src/test/kotlin/` in the library's package, one `*Test.kt` class per area.
-Fixtures and golden files go in `src/test/resources/fixtures/`.
+- `A11yChecksTest.kt`: Covers contrast calculation, touch target sizing based on density, seeded broken vs. fixed screen scenarios, node skipping (unimportant/zero-size), JSON serialization, and `A11yException` bounds validation.
+- `A11yPropertiesTest.kt`: Covers property-based invariants for `Contrast.ratio` (symmetry/bounds) and touch target assertions.
+- `TextTest.kt` & `TextPropertiesTest.kt`: Covers `Text.normalize` string processing logic and `BlankInputException` handling.
