@@ -1,0 +1,16 @@
+# android-a11y-checks
+
+> Accessibility rule engine for Android view and Compose semantics snapshots that reports touch target, contrast and labelling problems with WCAG 2.2 success criterion references Kotlin library `io.github.trysac:android-a11y-checks`, package
+> `io.github.trysac.android_a11y_checks`, MIT licensed, Kotlin 2 on Java >= 21, standard library only.
+
+## Docs
+
+- [README](README.md): problem, install, usage example
+- [AGENTS](AGENTS.md): commands, folder map, conventions, limits
+- [Architecture](docs/ARCHITECTURE.md): shape of the library and its public API
+- [Testing](docs/TESTING.md): how to run and extend the tests
+
+## Optional
+
+- [Stack](docs/STACK.md): tools used and discarded
+- [Changelog](CHANGELOG.md): release history
